@@ -1,0 +1,9 @@
+*.jpg
+*.png
+*.pyc
+
+# env variables
+*.venv/
+/data
+/results
+
