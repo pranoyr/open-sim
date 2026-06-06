@@ -7,4 +7,14 @@ requires-python = ">=3.12"
 dependencies = [
     "meshcat>=0.3.2",
     "pin>=4.0.0",
+    "rectified-flow-pytorch>=0.10.4",
+    "gymnasium>=0.29.0",
+    "gym-aloha>=0.1.1",
+    "h5py>=3.10.0",
+    "imageio[ffmpeg]>=2.33.0",
+    "mimic-video>=0.3.9",
+    "torchvision>=0.27.0",
+    "decord>=0.6.0",
+    "opencv-python>=4.13.0.92",
+    "diffusers>=0.37.1",
 ]

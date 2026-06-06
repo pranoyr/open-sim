@@ -1,6 +1,8 @@
 *.jpg
 *.png
 *.pyc
+*.json
+*.mp4
 
 # env variables
 *.venv/

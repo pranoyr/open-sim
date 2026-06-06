@@ -228,6 +228,73 @@ class MittyFlowMatchingDataset(Dataset):
             "reference_image": robot_reference_img
         }
 
+class AlohaBabblingDataset(Dataset):
+    def __init__(self, data_dir="babbling-dataset", chunk_len=15, img_size=32):
+        self.chunk_len = chunk_len
+        self.img_size = img_size
+        self.samples = []
+        
+        # Discover json files
+        import glob
+        json_files = glob.glob(os.path.join(data_dir, "*.json"))
+        for jf in json_files:
+            vf = jf.replace(".json", ".mp4")
+            if os.path.exists(vf):
+                self.samples.append((vf, jf))
+                
+        import torchvision.transforms as T
+        self.transform = T.Compose([
+            T.ToPILImage(),
+            T.Resize((img_size, img_size)),
+            T.ToTensor()
+        ])
+        
+    def __len__(self):
+        return len(self.samples)
+        
+    def __getitem__(self, idx):
+        import imageio
+        import json
+        vf, jf = self.samples[idx]
+        
+        # Load actions
+        with open(jf, "r") as f:
+            data = json.load(f)
+            actions = data["actions"]  # list of lists
+            
+        actions_tensor = torch.tensor(actions, dtype=torch.float32)
+        
+        # Load video
+        reader = imageio.get_reader(vf)
+        frames = []
+        for i, frame in enumerate(reader):
+            if i >= len(actions):
+                break
+            # Convert to Tensor (C, H, W)
+            frame_tensor = self.transform(frame)
+            frames.append(frame_tensor)
+            
+        reader.close()
+        video_tensor = torch.stack(frames, dim=0) # (T, C, H, W)
+        
+        # Truncate or pad to chunk_len
+        if video_tensor.shape[0] >= self.chunk_len:
+            video_tensor = video_tensor[:self.chunk_len]
+            actions_tensor = actions_tensor[:self.chunk_len]
+        else:
+            # Pad
+            T_curr = video_tensor.shape[0]
+            pad_len = self.chunk_len - T_curr
+            v_pad = torch.zeros((pad_len, *video_tensor.shape[1:]))
+            video_tensor = torch.cat([video_tensor, v_pad], dim=0)
+            a_pad = torch.zeros((pad_len, actions_tensor.shape[1]))
+            actions_tensor = torch.cat([actions_tensor, a_pad], dim=0)
+            
+        # joint_state is the first action
+        joint_state = actions_tensor[0].clone()
+        
+        return video_tensor, actions_tensor, joint_state
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()

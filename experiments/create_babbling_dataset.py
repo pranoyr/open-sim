@@ -67,7 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("--env_id", type=str, default="gym_aloha/AlohaInsertion-v0", help="ALOHA Gym environment ID")
     parser.add_argument("--episodes", type=int, default=2, help="Number of episodes to record")
     parser.add_argument("--steps", type=int, default=50, help="Number of steps per episode")
-    parser.add_argument("--output", type=str, default="IDM-dataset/aloha_babbling", help="Output file prefix (will append _ep0.mp4, _ep0.json, etc.)")
+    parser.add_argument("--output", type=str, default="babbling-dataset/aloha_babbling", help="Output file prefix (will append _ep0.mp4, _ep0.json, etc.)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     
     args = parser.parse_args()
